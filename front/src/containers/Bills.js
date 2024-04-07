@@ -27,6 +27,39 @@ export default class {
     $('#modaleFile').modal('show')
   }
 
+  // getBills = () => {
+  //   if (this.store) {
+  //     return this.store
+  //     .bills()
+  //     .list()
+  //     .then(snapshot => {
+  //       const bills = snapshot
+  //         // Sort bills by date in descending order
+  //         .sort((a, b) => new Date(b.date) - new Date(a.date))
+  //         .map(doc => {
+  //           try {
+  //             return {
+  //               ...doc,
+  //               date: formatDate(doc.date),
+  //               status: formatStatus(doc.status)
+  //             }
+  //           } catch(e) {
+  //             // if for some reason, corrupted data was introduced, we manage here failing formatDate function
+  //             // log the error and return unformatted date in that case
+  //             console.log(e,'for',doc)
+  //             return {
+  //               ...doc,
+  //               date: doc.date,
+  //               status: formatStatus(doc.status)
+  //             }
+  //           }
+  //         })
+  //       console.log('length', bills.length)
+  //       return bills
+  //     })
+  //   }
+  // }
+
   getBills = () => {
     if (this.store) {
       return this.store
@@ -34,6 +67,8 @@ export default class {
       .list()
       .then(snapshot => {
         const bills = snapshot
+          // Sort bills by date in descending order
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
           .map(doc => {
             try {
               return {
@@ -52,7 +87,7 @@ export default class {
               }
             }
           })
-          console.log('length', bills.length)
+        console.log('length', bills.length)
         return bills
       })
     }
