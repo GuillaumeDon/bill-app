@@ -68,7 +68,7 @@ export default class {
       .then(snapshot => {
         const bills = snapshot
           // Sort bills by date in descending order
-          .sort((a, b) => new Date(b.date) - new Date(a.date))
+          .sort((a, b) => new Date(a.date) - new Date(b.date))
           .map(doc => {
             try {
               return {
