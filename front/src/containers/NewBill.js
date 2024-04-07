@@ -23,7 +23,7 @@ export default class NewBill {
     const fileExtension = fileName.split('.').pop().toLowerCase()
 
     if (!['jpg', 'jpeg', 'png'].includes(fileExtension)) {
-      alert('Invalid file type. Please upload a jpg, jpeg or png file.')
+      alert('Type de fichier invalide. Veuillez télécharger un fichier jpg, jpeg ou png.')
       e.target.value = null
       return
     }
