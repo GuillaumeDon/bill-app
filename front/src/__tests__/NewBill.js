@@ -28,7 +28,7 @@ describe('Given I am connected as an employee', () => {
   })
 
   describe('When a new bill is submitted in the correct format', () => {
-    test('Then submit a new bill', async () => {
+    test('Then submit a new bill with status 200', async () => {
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
       window.localStorage.setItem('user', JSON.stringify({
         type: 'Employee'
@@ -50,7 +50,7 @@ describe('Given I am connected as an employee', () => {
             update: function(bill) {
               return {
                 then: function (fn) {
-                  return { catch: () => {}}
+                  return Promise.resolve({ status: 200 }); // Resolve with status 200
                 }
               }
             }
