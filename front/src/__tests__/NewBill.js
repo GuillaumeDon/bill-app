@@ -1,19 +1,41 @@
 /**
  * @jest-environment jsdom
  */
-
-import { fireEvent, screen } from "@testing-library/dom";
+import '@testing-library/jest-dom';
+import { fireEvent, screen, waitFor } from "@testing-library/dom"; // Assurez-vous que waitFor est importé
 import NewBillUI from "../views/NewBillUI.js";
 import NewBill from "../containers/NewBill.js";
 import mockStore from "../__mocks__/store";
 import { ROUTES, ROUTES_PATH } from "../constants/routes";
 import {localStorageMock} from "../__mocks__/localStorage.js";
-import userEvent from "@testing-library/user-event"
+import userEvent from "@testing-library/user-event";
 import router from "../app/Router.js";
 
 jest.mock("../app/store", () => mockStore)
 
 describe("Given I am connected as an employee", () => {
+
+  describe("When I am on Bills Page", () => {
+    test("Then bill icon in vertical layout should be highlighted", async () => {
+      Object.defineProperty(window, "localStorage", {
+        value: localStorageMock,
+      });
+      window.localStorage.setItem(
+        "user",
+        JSON.stringify({
+          type: "Employee",
+        })
+      );
+      const root = document.createElement("div");
+      root.setAttribute("id", "root");
+      document.body.append(root);
+      router();
+      window.onNavigate(ROUTES_PATH.NewBill);
+
+      const mailIcon = screen.getByTestId("icon-mail");
+      await waitFor(() => mailIcon); // Attendez que l'élément soit rendu
+      expect(mailIcon).toHaveClass("active-icon"); // Vérifiez si l'icône est bien mise en évidence
+    });
   describe("When I submit a new Bill", () => {
     // Vérifie que le bill se sauvegarde
     test("Then must save the bill", async () => {
@@ -89,4 +111,4 @@ describe("Given I am connected as an employee", () => {
       expect(handleSubmit).toHaveBeenCalled();
     })
   })
-})
+})})
