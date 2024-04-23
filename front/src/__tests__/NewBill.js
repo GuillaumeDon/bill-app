@@ -1,114 +1,100 @@
 /**
  * @jest-environment jsdom
  */
-import '@testing-library/jest-dom';
-import { fireEvent, screen, waitFor } from "@testing-library/dom"; // Assurez-vous que waitFor est importé
-import NewBillUI from "../views/NewBillUI.js";
+
+import "@testing-library/jest-dom";
+import { screen, fireEvent, getByTestId, waitFor } from "@testing-library/dom";
+import mockStore from "../__mocks__/store.js";
 import NewBill from "../containers/NewBill.js";
-import mockStore from "../__mocks__/store";
-import { ROUTES, ROUTES_PATH } from "../constants/routes";
-import {localStorageMock} from "../__mocks__/localStorage.js";
-import userEvent from "@testing-library/user-event";
+import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
+import { localStorageMock } from "../__mocks__/localStorage.js";
 import router from "../app/Router.js";
+import Bills from "../containers/Bills.js";
 
-jest.mock("../app/store", () => mockStore)
+jest.mock("../app/Store", () => mockStore);
 
-describe("Given I am connected as an employee", () => {
+describe("When I am on NewBill Page", () => {
+  beforeEach(() => {
+    Object.defineProperty(window, "localStorage", { value: localStorageMock });
+    window.localStorage.setItem(
+      "user",
+      JSON.stringify({
+        type: "Employee",
+      })
+    );
+    const root = document.createElement("div");
+    root.setAttribute("id", "root");
+    document.body.append(root);
+    router();
+  });
 
-  describe("When I am on Bills Page", () => {
-    test("Then bill icon in vertical layout should be highlighted", async () => {
-      Object.defineProperty(window, "localStorage", {
-        value: localStorageMock,
+  test("Then mail icon on verticallayout should be highlighted", async () => {
+    window.onNavigate(ROUTES_PATH.NewBill);
+    await waitFor(() => screen.getByTestId("icon-mail"));
+    const Icon = screen.getByTestId("icon-mail");
+    expect(Icon).toHaveClass("active-icon");
+  });
+
+  describe ("When I am on NewBill form", () => {
+    test("Then I add File", async () => {
+      const dashboard = new NewBill({
+        document,
+        onNavigate,
+        store: mockStore,
+        localStorage: localStorageMock,
       });
-      window.localStorage.setItem(
-        "user",
-        JSON.stringify({
-          type: "Employee",
-        })
-      );
-      const root = document.createElement("div");
-      root.setAttribute("id", "root");
-      document.body.append(root);
-      router();
-      window.onNavigate(ROUTES_PATH.NewBill);
-
-      const mailIcon = screen.getByTestId("icon-mail");
-      await waitFor(() => mailIcon); // Attendez que l'élément soit rendu
-      expect(mailIcon).toHaveClass("active-icon"); // Vérifiez si l'icône est bien mise en évidence
+  
+      const handleChangeFile = jest.fn(dashboard.handleChangeFile);
+      const inputFile = screen.getByTestId("file");
+      inputFile.addEventListener("change", handleChangeFile);
+      fireEvent.change(inputFile, {
+        target: {
+          files: [
+            new File(["document.jpg"], "document.jpg", {
+              type: "document/jpg",
+            }),
+          ],
+        },
+      });
+  
+      expect(handleChangeFile).toHaveBeenCalled();
+      expect(handleChangeFile).toBeCalled();
+      expect(screen.getByText("Envoyer une note de frais")).toBeTruthy();
     });
-  describe("When I submit a new Bill", () => {
-    // Vérifie que le bill se sauvegarde
-    test("Then must save the bill", async () => {
-      const onNavigate = (pathname) => {
-        document.body.innerHTML = ROUTES({ pathname })
-      }
-  
-      Object.defineProperty(window, "localStorage", { value: localStorageMock })
-      window.localStorage.setItem("user", JSON.stringify({
-        type: "Employee"
-      }))
-  
-      const html = NewBillUI()
-      document.body.innerHTML = html
-  
-      const newBillInit = new NewBill({
-        document, onNavigate, store: null, localStorage: window.localStorage
-      })
-  
-      const formNewBill = screen.getByTestId("form-new-bill")
-      expect(formNewBill).toBeTruthy()
-      
-      const handleSubmit = jest.fn((e) => newBillInit.handleSubmit(e));
-      formNewBill.addEventListener("submit", handleSubmit);
-      fireEvent.submit(formNewBill);
-      expect(handleSubmit).toHaveBeenCalled();
-    });
-
-    test("Then show the new bill page", async () => {
-      localStorage.setItem("user", JSON.stringify({ type: "Employee", email: "a@a" }));
-      const root = document.createElement("div")
-      root.setAttribute("id", "root")
-      document.body.append(root)
-      router()
-      window.onNavigate(ROUTES_PATH.NewBill)
-    })
-
-    // Vérifie si un fichier est bien chargé
-    test("Then verify the file bill", async() => {
-      jest.spyOn(mockStore, "bills")
-
-      const onNavigate = (pathname) => {
-        document.body.innerHTML = ROUTES({ pathname })
-      }      
-
-      Object.defineProperty(window, "localStorage", { value: localStorageMock })
-      Object.defineProperty(window, "location", { value: { hash: ROUTES_PATH['NewBill']} })
-      window.localStorage.setItem("user", JSON.stringify({
-        type: "Employee"
-      }))
-
-      const html = NewBillUI()
-      document.body.innerHTML = html
-
-      const newBillInit = new NewBill({
-        document, onNavigate, store: mockStore, localStorage: window.localStorage
-      })
-
-      const file = new File(['image'], 'image.png', {type: 'image/png'});
-      const handleChangeFile = jest.fn((e) => newBillInit.handleChangeFile(e));
-      const formNewBill = screen.getByTestId("form-new-bill")
-      const billFile = screen.getByTestId('file');
-
-      billFile.addEventListener("change", handleChangeFile);     
-      userEvent.upload(billFile, file)
-      
-      expect(billFile.files[0].name).toBeDefined()
-      expect(handleChangeFile).toBeCalled()
-     
-      const handleSubmit = jest.fn((e) => newBillInit.handleSubmit(e));
-      formNewBill.addEventListener("submit", handleSubmit);     
-      fireEvent.submit(formNewBill);
-      expect(handleSubmit).toHaveBeenCalled();
-    })
   })
-})})
+});
+
+/* Api */
+describe("When I am on NewBill Page and submit the form", () => {
+  beforeEach(() => {
+    jest.spyOn(mockStore, "bills");
+    Object.defineProperty(window, "localStorage", { value: localStorageMock });
+    window.localStorage.setItem(
+      "user",
+      JSON.stringify({
+        type: "Employee",
+        email: "a@a",
+      })
+    );
+    const root = document.createElement("div");
+    root.setAttribute("id", "root");
+    document.body.appendChild(root);
+    router();
+  });
+
+  describe("user submit form valid", () => {
+    test("call api update bills", async () => {
+      const newBill = new NewBill({
+        document,
+        onNavigate,
+        store: mockStore,
+        localeStorage: localStorageMock,
+      });
+      const handleSubmit = jest.fn(newBill.handleSubmit);
+      const form = screen.getByTestId("form-new-bill");
+      form.addEventListener("submit", handleSubmit);
+      fireEvent.submit(form);
+      expect(mockStore.bills).toHaveBeenCalled();
+    });
+  });
+});
