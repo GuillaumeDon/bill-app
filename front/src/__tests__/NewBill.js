@@ -7,6 +7,8 @@
 import "@testing-library/jest-dom";
 import { screen, fireEvent, getByTestId, waitFor } from "@testing-library/dom";
 import mockStore from "../__mocks__/store.js";
+import mockedStore from "../__mocks__/store";
+
 import NewBill from "../containers/NewBill.js";
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
@@ -84,6 +86,7 @@ describe("When I am on NewBill Page and submit the form", () => {
     router();
   });
 
+     //réorganiser, faire un test form vide et un plein
   describe("user submit form valid", () => {
     test("post update bills", async () => {
       const newBill = new NewBill({
@@ -97,6 +100,94 @@ describe("When I am on NewBill Page and submit the form", () => {
       form.addEventListener("submit", handleSubmit);
       fireEvent.submit(form);
       expect(mockStore.bills).toHaveBeenCalled();
+   
     });
   });
+
+
+  //A FAIRE
+  // test("fetches bills from an API and fails with 404 message error", async () => {
+  //   mockedStore.NewBill.mockImplementationOnce(() => {
+  //     return {
+  //       list: () => {
+  //         return Promise.reject(new Error("Erreur 404"));
+  //       },
+  //     };
+  //   });
+  //   window.onNavigate(ROUTES_PATH.Bills);
+  //   await new Promise(process.nextTick);
+  //   const message = screen.getByText(/Erreur 404/);
+  //   expect(message).toBeTruthy();
+  // });
+
+  // test("fetches messages from an API and fails with 500 message error", async () => {
+  //   mockedStore.NewBills.mockImplementationOnce(() => {
+  //     return {
+  //       list: () => {
+  //         return Promise.reject(new Error("Erreur 500"));
+  //       },
+  //     };
+  //   });
+
+  //   window.onNavigate(ROUTES_PATH.NewBill);
+  //   await new Promise(process.nextTick);
+  //   const message = screen.getByText(/Erreur 500/);
+  //   expect(message).toBeTruthy();
+  // });
 });
+
+//3 tests à ajouter:
+
+/*
+Si formulaire avec données vide ou non valide. Tester si on reste sur le form
+1 .  const inputAmount = screen.getByTestId("amount");
+      expect(inputAmount.value).toBe("");
+
+
+      test : 
+       const form = screen.getByTestId("form-new-bill");
+      const handleSubmit = jest.fn((e) => e.preventDefault());
+      form.addEventListener("submit",handleSubmit)
+      fireEvent.submit(form)
+      expect(screen.getByTestId("form-new-bill")).toBeTruthy();
+
+
+Si le form est bien rempli, si il est soumis.
+
+        const newBillPage = new NewBill({
+          document, onNavigate, store, localStorage: window.localStorage
+        })
+
+        screen.getByTestId("pct").value = "valeur" ou par variable.. //inputData.pct
+
+        newBillPage.fileUrl = inputData.fileUrl // check
+
+
+        const formNewBill = screen.getByTestId("form-new-bill");
+        const handleSubmit = jest.fn(newBillPage.handleSubmit);
+        newBillPage.updateBill = jest.fn();
+        formNewBill.addEventListener("submit", handleSubmit);
+        fireEvent.submit(formNewBill);
+  
+        expect(newBillPage.updateBill).toHaveBeenCalled();
+
+
+
+Si lorsqu'on change l'image, on doit avoir une fonction appelée pour vérifier l'extension
+d'image
+
+
+
+test a faire : c'est bon
+
+      const file = new File([""], "upload.jpg",{type:"image/jpeg"});
+      const inputFile = screen.getByTestId("file");
+      const handleChangeFile = jest.fn(newBillPage.handleChangeFile);
+      
+			inputFile.addEventListener("change", handleChangeFile);
+			fireEvent.change(inputFile,{target:{files:[file]} });
+
+      expect(handleChangeFile).toHaveBeenCalled();
+
+
+*/
