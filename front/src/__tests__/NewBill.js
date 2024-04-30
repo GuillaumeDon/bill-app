@@ -85,7 +85,7 @@ describe("When I am on NewBill Page and submit the form", () => {
   });
 
   describe("user submit form valid", () => {
-    test("call api update bills", async () => {
+    test("post update bills", async () => {
       const newBill = new NewBill({
         document,
         onNavigate,
