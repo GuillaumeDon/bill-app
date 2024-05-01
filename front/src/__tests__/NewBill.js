@@ -88,37 +88,35 @@ describe("When I am on NewBill Page and submit the form", () => {
 
   describe("user submit form valid", () => {
     test("Submitting the new bill form should call updateBill method", async () => {
-      const newBill = new NewBill({
+      const inputData = {
+        pct: "valeur",
+        fileUrl: "http://example.com/file.jpg",
+      };
+
+      const newBillPage = new NewBill({
         document,
         onNavigate,
         store: mockStore,
-        localeStorage: localStorageMock,
+        localStorage: localStorageMock,
       });
 
-      // Attendez que le composant soit initialisé et que le formulaire soit rendu dans le DOM
+      screen.getByTestId("pct").value = inputData.pct;
+      newBillPage.fileUrl = inputData.fileUrl;
+
       await waitFor(() => {
         screen.getByTestId("form-new-bill");
       });
 
-      // Maintenant, vous pouvez accéder au formulaire dans le DOM
-      const form = document.querySelector(`form[data-testid="form-new-bill"]`);
+      const formNewBill = screen.getByTestId("form-new-bill");
+      const handleSubmit = jest.fn(newBillPage.handleSubmit);
+      newBillPage.updateBill = jest.fn();
+      formNewBill.addEventListener("submit", handleSubmit);
+      fireEvent.submit(formNewBill);
 
-      // Vérifiez si le formulaire a été correctement sélectionné
-      expect(form).toBeTruthy();
-
-      // Ajoutez un écouteur d'événements uniquement si le formulaire existe
-      if (form) {
-        form.addEventListener("submit", newBill.handleSubmit);
-        fireEvent.submit(form);
-      } else {
-        throw new Error("Form not found in DOM");
-      }
-
-      expect(mockStore.bills).toHaveBeenCalled();
+      expect(newBillPage.updateBill).toHaveBeenCalled();
     });
   });
 });
-
     
 
 
