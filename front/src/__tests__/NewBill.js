@@ -7,7 +7,7 @@
 import "@testing-library/jest-dom";
 import { screen, fireEvent, getByTestId, waitFor } from "@testing-library/dom";
 import mockStore from "../__mocks__/store.js";
-import mockedStore from "../__mocks__/store";
+
 
 import NewBill from "../containers/NewBill.js";
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
@@ -86,23 +86,41 @@ describe("When I am on NewBill Page and submit the form", () => {
     router();
   });
 
-     //réorganiser, faire un test form vide et un plein
   describe("user submit form valid", () => {
-    test("post update bills", async () => {
+    test("Submitting the new bill form should call updateBill method", async () => {
       const newBill = new NewBill({
         document,
         onNavigate,
         store: mockStore,
         localeStorage: localStorageMock,
       });
-      const handleSubmit = jest.fn(newBill.handleSubmit);
-      const form = screen.getByTestId("form-new-bill");
-      form.addEventListener("submit", handleSubmit);
-      fireEvent.submit(form);
+
+      // Attendez que le composant soit initialisé et que le formulaire soit rendu dans le DOM
+      await waitFor(() => {
+        screen.getByTestId("form-new-bill");
+      });
+
+      // Maintenant, vous pouvez accéder au formulaire dans le DOM
+      const form = document.querySelector(`form[data-testid="form-new-bill"]`);
+
+      // Vérifiez si le formulaire a été correctement sélectionné
+      expect(form).toBeTruthy();
+
+      // Ajoutez un écouteur d'événements uniquement si le formulaire existe
+      if (form) {
+        form.addEventListener("submit", newBill.handleSubmit);
+        fireEvent.submit(form);
+      } else {
+        throw new Error("Form not found in DOM");
+      }
+
       expect(mockStore.bills).toHaveBeenCalled();
-   
     });
   });
+});
+
+    
+
 
 
   //A FAIRE
@@ -134,7 +152,7 @@ describe("When I am on NewBill Page and submit the form", () => {
   //   const message = screen.getByText(/Erreur 500/);
   //   expect(message).toBeTruthy();
   // });
-});
+
 
 //3 tests à ajouter:
 
