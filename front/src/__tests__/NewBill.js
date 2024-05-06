@@ -60,6 +60,8 @@ describe("When I am on NewBill Page", () => {
           ],
         },
       });
+
+      //if pdf a essayer, un else pour l'erreur
   
       expect(handleChangeFile).toHaveBeenCalled();
       expect(handleChangeFile).toBeCalled();
@@ -90,6 +92,7 @@ describe("When I am on NewBill Page and submit the form", () => {
     test("Submitting the new bill form should call updateBill method", async () => {
       const inputData = {
         pct: "valeur",
+        //ici tu rajouters autres inputs
         fileUrl: "http://example.com/file.jpg",
       };
 
@@ -102,6 +105,7 @@ describe("When I am on NewBill Page and submit the form", () => {
 
       screen.getByTestId("pct").value = inputData.pct;
       newBillPage.fileUrl = inputData.fileUrl;
+      //tester pour chaque input
 
       await waitFor(() => {
         screen.getByTestId("form-new-bill");
@@ -112,12 +116,23 @@ describe("When I am on NewBill Page and submit the form", () => {
       newBillPage.updateBill = jest.fn();
       formNewBill.addEventListener("submit", handleSubmit);
       fireEvent.submit(formNewBill);
-
+      //update qlq chose 
       expect(newBillPage.updateBill).toHaveBeenCalled();
     });
   });
 });
     
+
+
+
+
+
+
+
+//Tester 500, 200 et 404 obligatoire
+
+
+
 
 
 
