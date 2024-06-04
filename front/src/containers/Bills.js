@@ -4,6 +4,8 @@ import Logout from "./Logout.js"
 
 
 console.log("test point de rupture");
+console.log("test 2 point de rupture");
+console.log("test 3 point de rupture");
 export default class {
   constructor({ document, onNavigate, store, localStorage }) {
     this.document = document
